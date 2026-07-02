@@ -1,0 +1,100 @@
+# ======================
+# Python Virtual Environments
+# ======================
+.venv/
+venv/
+env/
+ENV/
+CapCam Backend/archive/venv/
+
+# ======================
+# Python Cache
+# ======================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# ======================
+# Sensitive / Credentials
+# ======================
+frontend/unsername_password.txt
+*.env
+.env
+.env.*
+secrets.*
+
+# ======================
+# Large Files & Archives
+# ======================
+CapCam Backend/archive.zip
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# ======================
+# ML Training Data & Outputs
+# ======================
+CapCam Backend/archive/train/
+CapCam Backend/archive/test/
+CapCam Backend/archive/valid/
+CapCam Backend/archive/runs/
+
+# ======================
+# Pip / Package Cache Files
+# (version-named files in CapCam Backend)
+# ======================
+CapCam Backend/0.10
+CapCam Backend/0.20.0
+CapCam Backend/0.9.0
+CapCam Backend/1.0.1
+CapCam Backend/1.23.0
+CapCam Backend/1.3.1
+CapCam Backend/1.4.1
+CapCam Backend/1.8.0
+CapCam Backend/2
+CapCam Backend/2.0.18
+CapCam Backend/2.23.0
+CapCam Backend/2.7
+CapCam Backend/20.0
+CapCam Backend/2020.1
+CapCam Backend/2022.7
+CapCam Backend/3
+CapCam Backend/3.3.0
+CapCam Backend/4.22.0
+CapCam Backend/4.6.0
+CapCam Backend/5.3.1
+CapCam Backend/5.8.0
+CapCam Backend/7.1.2
+CapCam Backend/8
+CapCam Backend/pip
+CapCam Backend/ultralytics)
+
+# ======================
+# IDE / Editor
+# ======================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ======================
+# OS Generated Files
+# ======================
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ======================
+# Logs
+# ======================
+*.log
+logs/

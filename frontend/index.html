@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CapCam — Weapon Detection System</title>
+  <meta name="description" content="AI-powered real-time weapon detection and surveillance platform">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function () {
+      const auth = sessionStorage.getItem('capcam_auth');
+      if (!auth) { window.location.replace('login.html'); }
+    })();
+  </script>
+</head>
+<body>
+  <canvas id="dataFlowCanvas"></canvas>
+
+  <div id="app">
+
+    <!-- ═══ TOP BAR ═══ -->
+    <header id="topBar">
+      <div class="tb-brand">
+        <div class="tb-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="tb-title-wrap">
+          <div class="tb-name">CAP<span>CAM</span></div>
+          <div class="tb-sub">Weapon Detection · YOLOv11s · 200 Epochs</div>
+        </div>
+      </div>
+
+      <div class="tb-threat">
+        <div class="threat-label-row">
+          <span class="threat-label">THREAT LEVEL</span>
+          <span id="threatValue" class="threat-val">MONITORING</span>
+        </div>
+        <div class="threat-track">
+          <div id="threatFill" class="threat-fill" style="width:15%"></div>
+        </div>
+        <div class="threat-scale">
+          <span>LOW</span><span>MED</span><span>HIGH</span><span>CRITICAL</span>
+        </div>
+      </div>
+
+      <div class="tb-right">
+        <div id="systemStatusChip" class="status-chip offline">
+          <span id="systemStatusDot" class="chip-dot"></span>
+          <span id="systemStatusText">Offline</span>
+        </div>
+        <span id="lastUpdated" class="tb-ts mono">Last sync: --</span>
+        <button id="auditLogBtn" class="tb-btn">☰ Audit Log</button>
+        <button id="logoutBtn" class="tb-btn tb-btn-red">⏻ Logout</button>
+      </div>
+    </header>
+
+    <!-- ═══ MAIN 3-COLUMN GRID ═══ -->
+    <div id="mainGrid">
+
+      <!-- LEFT PANEL: Stats + Services -->
+      <aside id="leftPanel">
+
+        <div class="stat-card" id="scStreams">
+          <div class="sc-row">
+            <span class="sc-icon cyan">◉</span>
+            <span class="sc-label">Active Cameras</span>
+          </div>
+          <div class="sc-value placeholder" id="metricStreams">--</div>
+          <div class="sc-prog"><div class="sc-prog-fill cyan" style="width:100%"></div></div>
+        </div>
+
+        <div class="stat-card danger" id="scAlerts">
+          <div class="sc-row">
+            <span class="sc-icon red">⚠</span>
+            <span class="sc-label">Active Threats</span>
+          </div>
+          <div class="sc-value placeholder" id="metricAlerts">--</div>
+          <div class="sc-prog"><div class="sc-prog-fill red" id="alertProgFill" style="width:0%"></div></div>
+        </div>
+
+        <div class="stat-card" id="scLatency">
+          <div class="sc-row">
+            <span class="sc-icon amber">⚡</span>
+            <span class="sc-label">Inference ms</span>
+          </div>
+          <div class="sc-value placeholder" id="metricLatency">--</div>
+        </div>
+
+        <div class="stat-card glow" id="scDetections">
+          <div class="sc-row">
+            <span class="sc-icon cyan">◎</span>
+            <span class="sc-label">Detections Now</span>
+          </div>
+          <div class="sc-value placeholder" id="metricDetections">--</div>
+        </div>
+
+        <div class="stat-card" id="scEvidence">
+          <div class="sc-row">
+            <span class="sc-icon purple">⬡</span>
+            <span class="sc-label">Evidence Captured</span>
+          </div>
+          <div class="sc-value placeholder" id="metricEvidence">--</div>
+        </div>
+
+        <div class="left-heading">AI SERVICES</div>
+        <div id="servicesGrid"></div>
+
+      </aside>
+
+      <!-- CENTER PANEL: Camera + Timeline -->
+      <main id="centerPanel">
+
+        <div id="camBar">
+          <div class="cam-chips">
+            <span class="cam-chip live" id="streamStatus">● LIVE STREAM</span>
+            <span class="cam-chip">CAM-01</span>
+            <span class="cam-chip">Central Plaza</span>
+            <span class="cam-chip mono">RTSP · 1920×1080</span>
+            <span class="cam-chip mono">FPS: <span id="fpsValue">--</span></span>
+            <span class="cam-chip ai-chip" id="modelChip">AI: Disconnected</span>
+          </div>
+          <div class="cam-controls">
+            <button id="heatmapBtn" class="cam-ctrl-btn">🌡 Heatmap</button>
+            <div class="inf-wrap">
+              <span class="inf-txt">Inference</span>
+              <div id="inferenceToggle" class="toggle-switch" title="Toggle AI inference"></div>
+              <span id="inferenceLabel" class="inf-txt">Enabled</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="feedWrap">
+          <canvas id="cctvCanvas"></canvas>
+          <canvas id="heatmapCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity .3s;border-radius:10px;"></canvas>
+          <div id="detections"></div>
+          <div class="feed-corner tl"></div>
+          <div class="feed-corner tr"></div>
+          <div class="feed-corner bl"></div>
+          <div class="feed-corner br"></div>
+          <div class="feed-top">
+            <span id="streamBadge" class="feed-badge">● REC</span>
+            <span id="feedTimestamp" class="feed-ts mono">--</span>
+          </div>
+          <div class="feed-scan-line"></div>
+        </div>
+
+        <div id="timelineSection">
+          <div class="section-heading">DETECTION ACTIVITY — LAST 5 MIN</div>
+          <div id="timelineBox">
+            <canvas id="timelineCanvas"></canvas>
+            <div id="timelineEmpty">Waiting for data...</div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- RIGHT PANEL: Threats + Evidence -->
+      <aside id="rightPanel">
+
+        <div id="rightTabs">
+          <button class="sidebar-tab active" data-tab="alerts">🚨 Threats</button>
+          <button class="sidebar-tab" data-tab="evidence">📸 Evidence</button>
+        </div>
+
+        <div id="alertsTab" class="tab-pane">
+          <div class="pane-header">
+            <span>UNATTENDED OBJECT EVENTS</span>
+            <span id="alertCountBadge" class="count-badge">--</span>
+          </div>
+          <div id="alertsList">
+            <div class="empty-msg">Waiting for backend connection...</div>
+          </div>
+        </div>
+
+        <div id="evidenceTab" class="tab-pane" style="display:none">
+          <div class="pane-header">
+            <span>EVIDENCE SNAPSHOTS</span>
+            <span id="evidenceCountBadge" class="count-badge">--</span>
+          </div>
+          <div id="evidenceList">
+            <div class="empty-msg">No evidence captured yet</div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- AUDIT LOG MODAL -->
+  <div id="auditModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.75);backdrop-filter:blur(10px);align-items:center;justify-content:center;">
+    <div class="modal-card">
+      <div class="modal-hdr">
+        <span class="modal-title">Audit Log</span>
+        <button id="closeAudit" class="modal-close">✕</button>
+      </div>
+      <div id="auditModelInfo" class="modal-sub mono">Model: -- · Status: --</div>
+      <table class="audit-tbl">
+        <thead>
+          <tr><th>Event ID</th><th>Timestamp</th><th>Class</th><th>Confidence</th></tr>
+        </thead>
+        <tbody id="auditBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EVIDENCE IMAGE MODAL -->
+  <div id="evidenceModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.8);backdrop-filter:blur(12px);align-items:center;justify-content:center;">
+    <div class="modal-card" style="max-width:680px;">
+      <div class="modal-hdr">
+        <span class="modal-title" id="evidenceModalTitle">Evidence</span>
+        <button id="closeEvidence" class="modal-close">✕</button>
+      </div>
+      <img id="evidenceModalImg" style="width:100%;border-radius:8px;background:#0a0b14;" />
+      <div id="evidenceModalMeta" class="modal-sub mono" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

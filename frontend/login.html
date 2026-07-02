@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CapCam — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deep: #05060f;
+      --glass-bg: rgba(15, 18, 40, 0.65);
+      --glass-border: rgba(100, 180, 255, 0.15);
+      --neon-blue: #00b4ff;
+      --neon-cyan: #00e5ff;
+      --neon-purple: #8b5cf6;
+      --alert-red: #ff3b5c;
+      --active-green: #00e676;
+      --text-primary: #e8ecf4;
+      --text-secondary: rgba(200, 215, 240, 0.6);
+      --text-dim: rgba(160, 180, 210, 0.4);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(0, 180, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.07) 0%, transparent 50%),
+        linear-gradient(rgba(20, 25, 50, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 25, 50, 0.3) 1px, transparent 1px);
+      background-size: 100%, 100%, 50px 50px, 50px 50px;
+      z-index: 0;
+      pointer-events: none;
+      animation: gridDrift 30s linear infinite;
+    }
+
+    @keyframes gridDrift {
+      0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+      100% { background-position: 0 0, 0 0, 50px 50px, 50px 50px; }
+    }
+
+    canvas#bgCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    .login-wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      padding: 16px;
+    }
+
+    .login-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 80px rgba(0,180,255,0.04);
+      padding: 40px 36px;
+      animation: cardIn 0.6s cubic-bezier(.4,0,.2,1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .logo-icon {
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 18px;
+      box-shadow: 0 0 30px rgba(0,180,255,0.4);
+      animation: logoPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,180,255,0.3); }
+      50%       { box-shadow: 0 0 40px rgba(0,180,255,0.55), 0 0 60px rgba(139,92,246,0.2); }
+    }
+
+    .logo-text {
+      font-size: 26px; font-weight: 700; letter-spacing: 2px;
+      background: linear-gradient(90deg, #e8ecf4 30%, var(--neon-cyan) 70%, var(--neon-purple) 100%);
+      background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .login-subtitle {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 30px;
+    }
+
+    .form-group { margin-bottom: 18px; }
+
+    .form-label {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(10, 14, 35, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-input:focus {
+      border-color: rgba(0, 180, 255, 0.45);
+      box-shadow: 0 0 0 3px rgba(0, 180, 255, 0.08), 0 0 20px rgba(0,180,255,0.06);
+    }
+
+    .form-input::placeholder { color: var(--text-dim); }
+
+    .login-btn {
+      width: 100%;
+      padding: 13px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(0,180,255,0.9), rgba(139,92,246,0.85));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.35s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-btn::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+
+    .login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(0,180,255,0.3); }
+    .login-btn:hover::before { opacity: 1; }
+    .login-btn:active { transform: translateY(0); }
+
+    .error-msg {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(255, 59, 92, 0.1);
+      border: 1px solid rgba(255, 59, 92, 0.25);
+      color: var(--alert-red);
+      font-size: 11px;
+      text-align: center;
+      display: none;
+    }
+
+    .login-footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .login-footer span { color: var(--neon-cyan); }
+  </style>
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-icon">C</div>
+        <div class="logo-text">CAPCAM</div>
+      </div>
+      <div class="login-subtitle">Secure AI Surveillance Portal</div>
+
+      <form id="loginForm" onsubmit="doLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="username">Username</label>
+          <input class="form-input" id="username" type="text" placeholder="Enter username" autocomplete="username" autofocus />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" id="password" type="password" placeholder="Enter password" autocomplete="current-password" />
+        </div>
+        <button class="login-btn" type="submit" id="loginBtn">Sign In →</button>
+        <div class="error-msg" id="errorMsg">Invalid username or password</div>
+      </form>
+
+      <div class="login-footer">
+        CapCam AI Surveillance &nbsp;·&nbsp; <span>v2.0</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Credentials ───────────────────────────────────────
+    const USERS = {
+      'Piyush': 'Piyush2211'
+    };
+
+    function doLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value;
+      const err = document.getElementById('errorMsg');
+      const btn = document.getElementById('loginBtn');
+
+      btn.textContent = 'Verifying...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        if (USERS[u] && USERS[u] === p) {
+          // Store session
+          sessionStorage.setItem('capcam_auth', JSON.stringify({ user: u, ts: Date.now() }));
+          btn.textContent = '✓ Access Granted';
+          btn.style.background = 'linear-gradient(135deg,rgba(0,230,118,0.85),rgba(0,180,100,0.8))';
+          setTimeout(() => { window.location.href = 'index.html'; }, 600);
+        } else {
+          err.style.display = 'block';
+          btn.textContent = 'Sign In →';
+          btn.disabled = false;
+          document.getElementById('password').value = '';
+          document.getElementById('password').focus();
+          setTimeout(() => { err.style.display = 'none'; }, 3000);
+        }
+      }, 400);
+    }
+
+    // ── Background particles ──────────────────────────────
+    const c = document.getElementById('bgCanvas'), x = c.getContext('2d');
+    function sz() { c.width = innerWidth; c.height = innerHeight; }
+    sz(); window.addEventListener('resize', sz);
+    const pts = Array.from({length: 30}, () => ({
+      x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+      r: Math.random()*1.2+.3, vx:(Math.random()-.5)*.25, vy:(Math.random()-.5)*.25,
+      a: Math.random()*.1+.03
+    }));
+    function draw() {
+      x.clearRect(0,0,c.width,c.height);
+      pts.forEach(p => {
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0)p.x=c.width; if(p.x>c.width)p.x=0;
+        if(p.y<0)p.y=c.height; if(p.y>c.height)p.y=0;
+        x.beginPath(); x.arc(p.x,p.y,p.r,0,Math.PI*2);
+        x.fillStyle=`rgba(0,180,255,${p.a})`; x.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  </script>
+</body>
+</html>

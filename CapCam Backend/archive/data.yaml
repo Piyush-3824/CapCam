@@ -1,0 +1,6 @@
+train: d:\CapCam Backend\archive\train\images
+val: d:\CapCam Backend\archive\valid\images
+
+nc: 9
+names: ['AKM', 'DANGER_POSE', 'KNIFE', 'M4', 'NOT_DANGER_POSE', 'PKS', 'RPG', 'SNIPER', 'pistol']
+
