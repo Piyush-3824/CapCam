@@ -36,6 +36,7 @@ Capcam Main Project/
 │       └── yolo26n.pt        # Additional model weights
 ├── requirements.txt
 └── README.md
+└── best.pt
 ```
 
 ---
@@ -70,7 +71,7 @@ Open `frontend/server.py` and update the `MODEL_PATH` variable to point to your 
 MODEL_PATH = r"path\to\your\best.pt"
 ```
 
-> **Note:** The trained model weights (`best.pt`) are not included in this repo due to file size. Train your own using the provided `train_model.py` or contact the project owner.
+> **Note:** The trained model weights (`best.pt`) are added recently in this repo due to file size. Train your own using the provided `train_model.py` or use provided (`best.pt`) file
 
 ### 5. Run the backend server
 ```bash
