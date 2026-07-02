@@ -4,6 +4,9 @@
 
 CapCam is a real-time weapon detection system that combines a **YOLO-based computer vision backend** with a **web-based frontend dashboard** for live camera surveillance, threat alerting, and analytics.
 
+<img width="1920" height="907" alt="Screenshot 2026-07-02 210036" src="https://github.com/user-attachments/assets/07e1e043-0168-4186-989f-2a0abe61f03b" />
+
+
 ---
 
 ## 🚀 Features
