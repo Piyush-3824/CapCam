@@ -1,3 +1,5 @@
+<img align="center" width="100" height="100" alt="b8dbe6bb-5dbd-4f05-af62-604aba46c642-removebg-preview" src="https://github.com/user-attachments/assets/9341767a-cf43-4736-a5f2-80c7488682de" />
+
 # CapCam — AI-Powered Security Surveillance System
 
 CapCam is a real-time weapon detection system that combines a **YOLO-based computer vision backend** with a **web-based frontend dashboard** for live camera surveillance, threat alerting, and analytics.
